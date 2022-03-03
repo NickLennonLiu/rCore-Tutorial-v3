@@ -18,7 +18,7 @@ pub fn print(args: fmt::Arguments) {
 
 #[macro_export]
 macro_rules! print {
-    ($fmt: literal $(, $($arg: tt)+)?) => {
+    ($fmt: literal $(, $($arg: tt)+)?) => { // tt for 'token tree'
         $crate::console::print(format_args!($fmt $(, $($arg)+)?));
     }
 }

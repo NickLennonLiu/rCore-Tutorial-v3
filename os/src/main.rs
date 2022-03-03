@@ -3,11 +3,13 @@
 #![feature(panic_info_message)]
 
 use core::arch::global_asm;
+use log::{debug, error, info};
 
 #[macro_use]
 mod console;
 mod lang_items;
 mod sbi;
+mod logging;
 
 global_asm!(include_str!("entry.asm"));
 
@@ -21,7 +23,7 @@ fn clear_bss() {
 
 #[no_mangle]
 pub fn rust_main() -> ! {
-    extern "C" {
+    extern "C" {    // 从低到高
         fn stext();
         fn etext();
         fn srodata();
@@ -34,14 +36,15 @@ pub fn rust_main() -> ! {
         fn boot_stack_top();
     }
     clear_bss();
-    println!("Hello, world!");
-    println!(".text [{:#x}, {:#x})", stext as usize, etext as usize);
-    println!(".rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
-    println!(".data [{:#x}, {:#x})", sdata as usize, edata as usize);
-    println!(
+    logging::init();
+    info!("Hello, world!");
+    info!(".text [{:#x}, {:#x})", stext as usize, etext as usize);
+    info!(".rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
+    info!(".data [{:#x}, {:#x})", sdata as usize, edata as usize);
+    info!(
         "boot_stack [{:#x}, {:#x})",
         boot_stack as usize, boot_stack_top as usize
     );
-    println!(".bss [{:#x}, {:#x})", sbss as usize, ebss as usize);
+    info!(".bss [{:#x}, {:#x})", sbss as usize, ebss as usize);
     panic!("Shutdown machine!");
 }
